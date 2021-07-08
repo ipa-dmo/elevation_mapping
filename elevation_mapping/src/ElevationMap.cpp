@@ -310,6 +310,12 @@ bool ElevationMap::fuse(const grid_map::Index& topLeftIndex, const grid_map::Ind
     Eigen::EigenSolver<Eigen::Matrix2d> solver(covarianceMatrix);
     Eigen::Array2d eigenvalues(solver.eigenvalues().real().cwiseAbs());
 
+    if (solver.info() == Eigen::NumericalIssue) {
+    ROS_ERROR_STREAM("EigenSolver NumericalIssue when fusing the map, covarianceMatrix: " << covarianceMatrix);
+    continue;
+    }
+
+
     Eigen::Array2d::Index maxEigenvalueIndex;
     eigenvalues.maxCoeff(&maxEigenvalueIndex);
     Eigen::Array2d::Index minEigenvalueIndex;
