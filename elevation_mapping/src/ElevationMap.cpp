@@ -314,6 +314,9 @@ bool ElevationMap::fuse(const grid_map::Index& topLeftIndex, const grid_map::Ind
     ROS_ERROR_STREAM("EigenSolver NumericalIssue when fusing the map, covarianceMatrix: " << covarianceMatrix);
     continue;
     }
+    else{
+    ROS_INFO_STREAM("EigenSolver no Numerical Issue when fusing, covarianceMatrix: " << covarianceMatrix);
+    }
 
 
     Eigen::Array2d::Index maxEigenvalueIndex;
