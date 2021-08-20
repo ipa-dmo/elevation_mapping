@@ -1,39 +1,40 @@
 # Robot.
-point_cloud_topic: "/camera/depth/points"
-map_frame_id: "base_link"
+point_cloud_topic: "/zed_node/point_cloud/cloud_registered"
+map_frame_id: "odom"
 robot_base_frame_id: "base_link"
-robot_pose_with_covariance_topic: "/zed2/zed_node/pose_with_covariance"
-robot_pose_cache_size: 200
+robot_pose_with_covariance_topic: "/elevation_mapping/pose_with_covariance2" #"/zed_node/pose_with_covariance"  #
+robot_pose_cache_size: 8000
+robot_odometry_topic: "/odometry/filtered"
 track_point_frame_id: "base_link"
 track_point_x: 0.0
 track_point_y: 0.0
 track_point_z: 0.0
 
 # Map.
-length_in_x:                                10.0
-length_in_y:                                10.0
+length_in_x:                                5.0
+length_in_y:                                5.0
 position_x:                                 0.0
 position_y:                                 0.0
-resolution:                                 0.02
+resolution:                                 0.1
 min_variance:                               0.0001
-max_variance:                               0.1
+max_variance:                               1
 mahalanobis_distance_threshold:             2.5
 multi_height_noise:                         0.01
 surface_normal_positive_axis:               z
-fused_map_publishing_rate:                  10
+fused_map_publishing_rate:                  1.0
 enable_visibility_cleanup:                  false
-visibility_cleanup_rate:                    10.0
+visibility_cleanup_rate:                    2.0
 scanning_duration:                          0.1
 
 # Additional
-min_update_rate:                            5.0
+min_update_rate:                            2.0
 fused_map_publishing_rate:                  1.0
 
 # Init submap
 initialize_elevation_map:                   false
 initialization_method:                      0
-length_in_x_init_submap:                    10.0
-length_in_y_init_submap:                    10.0
+length_in_x_init_submap:                    5.0
+length_in_y_init_submap:                    5.0
 margin_init_submap:                         0.3
 init_submap_height_offset:                  0.01
 target_frame_init_submap:                   base_link
@@ -43,8 +44,8 @@ target_frame_init_submap:                   base_link
 input_sources:
    input_front:
      type: pointcloud
-     topic: /camera/depth/points
-     queue_size: 1
+     topic: /zed_node/point_cloud/cloud_registered
+     queue_size: 5
      publish_on_update: true
      sensor_processor:
        ignore_points_above: .inf
@@ -52,9 +53,9 @@ input_sources:
        type: structured_light
        cutoff_min_depth: 0.01
        cutoff_max_depth: 20
-       normal_factor_a: 0.001063
-       normal_factor_b:  0.003949
-       normal_factor_c: 0.0
-       normal_factor_d: 0.0008278
-       normal_factor_e: 1
-       lateral_factor: 0.01576 # approx 1 deg
+       #normal_factor_a: 0.001063
+       #normal_factor_b:  0.003949
+       #normal_factor_c: 0.0
+       #normal_factor_d: 0.0008278
+       #normal_factor_e: 1
+       #lateral_factor: 0.01576 # approx 1 deg
