@@ -79,6 +79,17 @@ void ElevationMapping::setupSubscribers() {  // Handle deprecated point_cloud_to
     inputSources_.registerCallbacks(*this, make_pair("pointcloud", &ElevationMapping::pointCloudCallback));
   }
 
+  // Check first if the robotPoseTopic is set to the odom topic stuff
+  if (robotPoseTopic_=="/elevation_mapping/pose_with_covariance2") {
+    // robot Pose has be calculated from the defined odom topic
+    //Topic to publish
+
+    robotPosePublisher_ = nodeHandle_.advertise<geometry_msgs::PoseWithCovarianceStamped>("/elevation_mapping/pose_with_covariance2", 1);
+
+    //Topic to subscribe
+    robotOdomSubscriber_ = nodeHandle_.subscribe(robotOdometryTopic_, 1, &ElevationMapping::odomCallback, this);
+  }
+
   if (!robotPoseTopic_.empty()) {
     robotPoseSubscriber_.subscribe(nodeHandle_, robotPoseTopic_, 1);
     robotPoseCache_.connectInput(robotPoseSubscriber_);
@@ -167,6 +178,7 @@ bool ElevationMapping::readParameters() {
   nodeHandle_.param("point_cloud_topic", pointCloudTopic_, std::string("/points"));
   nodeHandle_.param("robot_pose_with_covariance_topic", robotPoseTopic_, std::string("/pose"));
   nodeHandle_.param("track_point_frame_id", trackPointFrameId_, std::string("/robot"));
+  nodeHandle_.param("robot_odometry_topic", robotOdometryTopic_, std::string("/odometry_unused"));
   nodeHandle_.param("track_point_x", trackPoint_.x(), 0.0);
   nodeHandle_.param("track_point_y", trackPoint_.y(), 0.0);
   nodeHandle_.param("track_point_z", trackPoint_.z(), 0.0);
@@ -327,6 +339,7 @@ void ElevationMapping::pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr
 
     if (currentPointCloudTime < oldestPoseTime) {
       ROS_WARN_THROTTLE(5, "No corresponding point cloud and pose are found. Waiting for first match. (Warning message is throttled, 5s.)");
+      ROS_WARN_THROTTLE(5, "Oldest Pose %f, newest point cloud %f", oldestPoseTime, currentPointCloudTime);
       return;
     } else {
       ROS_INFO("First corresponding point cloud and pose found, elevation mapping started. ");
@@ -755,6 +768,13 @@ void ElevationMapping::resetMapUpdateTimer() {
 
 void ElevationMapping::stopMapUpdateTimer() {
   mapUpdateTimer_.stop();
+}
+
+void ElevationMapping::odomCallback(const nav_msgs::Odometry& input) {
+  geometry_msgs::PoseWithCovarianceStamped output;
+  output.header = input.header;
+  output.pose = input.pose;
+  robotPosePublisher_.publish(output);
 }
 
 }  // namespace elevation_mapping

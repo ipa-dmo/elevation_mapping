@@ -21,6 +21,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <std_srvs/Empty.h>
 #include <tf/transform_listener.h>
+#include <nav_msgs/Odometry.h>
 
 // Eigen
 #include <Eigen/Core>
@@ -179,6 +180,12 @@ class ElevationMapping {
    */
   bool loadMapServiceCallback(grid_map_msgs::ProcessFile::Request& request, grid_map_msgs::ProcessFile::Response& response);
 
+  /*!
+  *  ROS service call function to transform the odometry topic to an Pose topic
+  */
+  void odomCallback(const nav_msgs::Odometry& input);
+ 
+ 
  private:
   /*!
    * Reads and verifies the ROS parameters.
@@ -264,6 +271,8 @@ class ElevationMapping {
   //! ROS subscribers.
   ros::Subscriber pointCloudSubscriber_;  //!< Deprecated, use input_source instead.
   message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> robotPoseSubscriber_;
+  ros::Subscriber robotOdomSubscriber_;
+  ros::Publisher robotPosePublisher_;
 
   //! ROS service servers.
   ros::ServiceServer fusionTriggerService_;
@@ -301,6 +310,7 @@ class ElevationMapping {
   //! ROS topics for subscriptions.
   std::string pointCloudTopic_;  //!< Deprecated, use input_source instead.
   std::string robotPoseTopic_;
+  std::string robotOdometryTopic_;
 
   //! Elevation map.
   ElevationMap map_;
